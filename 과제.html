@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    *{
+        text-align: center;
+    }
+    .list:hover{
+    transform: scale(1.2); /*눌럿을떄 확대효과*/
+    }
+
+    .list{
+        border: 1px solid midnightblue;
+        border-radius: 20px;
+        clear:both; 
+        width: 500px;
+        height: 100px;
+        text-align: center;
+        margin: auto auto 30px;
+        cursor : pointer; /*커서 모양변경*/
+        transition: transform ease-in-out .3s; /*마우스 대면 확대효과*/
+    }
+    button{
+        all:unset; /*CSS 속성을 전부 제거   / 버튼모양 제거 텍스트만남음*/
+        padding: 7px 3px;
+        margin-bottom: 20px;
+        text-align: center;
+        background-color: rgb(27, 93, 216); 
+        color: white;
+        font-weight: 500;
+        cursor: pointer;
+        border-radius: 10px;
+        transition: opacity linear .3s;
+        box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
+    }
+    button:hover{
+        opacity: 0.5;
+    }
+
+</style>
+<body>
+    <h1>메뉴 리스트 입니다.</h1>
+    <h2>식당이름</h2>
+    <p>메뉴 카테고리 대분류명 - 메뉴이름</p>
+    <button id="next">추가</button>
+
+    <script>
+        async function foodGet(nextcount) {
+            const response = await fetch('./data.json');
+            
+            let data = 0;
+            data = await response.json();
+
+            const menuList = data.body[0].MENU_NM;
+            const menuName = data.body[0].MENU_CTGRY_LCLAS_NM;
+            const menuRe = data.body[0].RSTR_NM;
+
+            function menuTag(menuList,menuName,menuRe){
+            //DOM 요소 만들어서 추가하기.
+            const menuListTag = document.createElement("span")
+            menuListTag.innerHTML = " - "+menuList;
+            const menuNameTag = document.createElement("span")
+            menuNameTag.innerHTML = menuName;
+            const menuReTag = document.createElement("h3")
+            menuReTag.innerHTML = menuRe;
+
+            const menuBox = document.createElement("div");
+            menuBox.append(menuReTag);
+            menuBox.append(menuNameTag);
+            menuBox.append(menuListTag); 
+            menuBox.classList.add("list");
+
+            document.querySelector("body").append(menuBox)
+
+            }
+            // 추가출력
+            for(let i = nextcount; i<nextcount+10; i++){
+                let count = 0;
+                for(let j = i; i<1000; j++) {
+                    if(data.body[j].MENU_ID == data.body[i].MENU_ID){
+                        count =j;
+                        break;
+                    }
+                }
+                menuTag(data.body[i].MENU_NM,
+                data.body[i].MENU_CTGRY_LCLAS_NM,
+                data.body[i].RSTR_NM);
+            }
+            menuTag(menuList,menuName,menuRe);
+        }
+        foodGet(0);
+
+        let nextcount = 0;
+        const button = document.querySelector("#next");
+        button.addEventListener("click", ()=> {
+            nextcount += 10;
+            foodGet(nextcount)
+        });
+    </script>
+</body>
+</html>
